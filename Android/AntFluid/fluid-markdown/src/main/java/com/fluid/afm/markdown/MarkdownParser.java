@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 
 import com.fluid.afm.ContextHolder;
 import com.fluid.afm.StreamOutStateObserver;
-import com.fluid.afm.markdown.code.CodeBlockPlugin;
 import com.fluid.afm.markdown.widget.PrinterMarkDownTextView;
 import com.fluid.afm.styles.MarkdownStyles;
 import com.fluid.afm.utils.MDLogger;
@@ -26,8 +25,6 @@ import io.noties.markwon.Markwon;
 import io.noties.markwon.MarkwonPlugin;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.core.MarkwonTheme;
-import io.noties.markwon.inlineparser.MarkwonInlineParser;
-import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin;
 
 public class MarkdownParser {
 
@@ -39,7 +36,7 @@ public class MarkdownParser {
     private MarkdownStyles mProductStyles;
     private MarkwonTheme mMarkwonTheme;
 
-    public MarkdownParser(Context context, List<AbstractMarkwonPlugin> plugins, PrinterMarkDownTextView textView, MarkdownStyles styles) {
+    public MarkdownParser(Context context, List<MarkwonPlugin> plugins, PrinterMarkDownTextView textView, MarkdownStyles styles) {
         this.mTextView = textView;
         mProductStyles = styles;
         init(context, plugins);
@@ -90,7 +87,7 @@ public class MarkdownParser {
         }
     }
 
-    private void init(final Context context, List<AbstractMarkwonPlugin> customPlugins) {
+    private void init(final Context context, List<MarkwonPlugin> customPlugins) {
         if(ContextHolder.getContext() == null) {
             ContextHolder.setContext(context.getApplicationContext());
         }
@@ -113,9 +110,8 @@ public class MarkdownParser {
 
     private ArrayList<AbstractMarkwonPlugin> getDefaultPlugins(final Context context) {
         long startTime = SystemClock.elapsedRealtime();
-        ArrayList<AbstractMarkwonPlugin> plugins = new ArrayList<>(4);
+        ArrayList<AbstractMarkwonPlugin> plugins = new ArrayList<>(2);
         plugins.add(CorePlugin.create(context));
-        plugins.add(CodeBlockPlugin.create(context, true));
         plugins.add(new AbstractMarkwonPlugin() {
 
             @NonNull
@@ -134,7 +130,6 @@ public class MarkdownParser {
             }
 
         });
-        plugins.add(MarkwonInlineParserPlugin.create(MarkwonInlineParser.factoryBuilder()));
         MDLogger.d(TAG, "addPlugin costTime=" + (SystemClock.elapsedRealtime() - startTime));
         return plugins;
     }

@@ -18,7 +18,6 @@ import com.fluid.afm.utils.Utils;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
-import org.commonmark.ext.gfm.tables.TableCell;
 import org.commonmark.node.Text;
 
 import java.util.regex.Matcher;
@@ -77,7 +76,7 @@ public class AfmTextPlugin extends AbstractMarkwonPlugin {
                     }
                     CustomImageSpan imageSpan = new CustomImageSpan(drawable);
                     spannable.setSpan(imageSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                } else if (textNode.getParent() instanceof TableCell) {
+                } else if (Utils.isInTableNode(textNode)) {
                     FootnoteInTableSpan span = new FootnoteInTableSpan(index);
                     spannable.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else {

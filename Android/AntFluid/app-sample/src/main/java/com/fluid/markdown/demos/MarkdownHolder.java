@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fluid.afm.R;
-import com.fluid.afm.markdown.MarkdownParserFactory;
+import com.fluid.markdown.SampleMarkdownPlugins;
 import com.fluid.afm.markdown.widget.PrinterMarkDownTextView;
 import com.fluid.afm.styles.MarkdownStyles;
 
@@ -18,7 +18,8 @@ public class MarkdownHolder extends RecyclerView.ViewHolder {
         mMarkdownTextView = itemView.findViewById(R.id.markdown);
         MarkdownStyles styles =  MarkdownStyles.getDefaultStyles();
         styles.linkStyle().icon("local://mipmap/link");
-        mMarkdownTextView.init(styles, null);
+        mMarkdownTextView.init(styles, null,
+                SampleMarkdownPlugins.create(itemView.getContext(), mMarkdownTextView, null));
     }
 
     public void bind(MarkdownData markdownData) {

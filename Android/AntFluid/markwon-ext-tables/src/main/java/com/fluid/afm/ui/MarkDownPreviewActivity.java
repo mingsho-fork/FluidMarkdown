@@ -15,9 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fluid.afm.R;
 import com.fluid.afm.TableBlockTitleBlockSpan;
-import com.fluid.afm.markdown.MarkdownParserFactory;
+import com.fluid.afm.markdown.code.CodeBlockPlugin;
 import com.fluid.afm.markdown.widget.PrinterMarkDownTextView;
 import com.fluid.afm.styles.CodeStyle;
 import com.fluid.afm.styles.MarkdownStyles;
@@ -29,7 +28,9 @@ import java.util.List;
 
 import io.noties.markwon.Markwon;
 import io.noties.markwon.MarkwonPlugin;
+import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.core.MarkwonTheme;
+import io.noties.markwon.ext.tables.R;
 import io.noties.markwon.ext.tables.TablePlugin;
 
 public class MarkDownPreviewActivity extends AppCompatActivity {
@@ -123,8 +124,10 @@ public class MarkDownPreviewActivity extends AppCompatActivity {
                     codeStyle.drawBorder(false);
                     style.codeStyle(codeStyle);
                 }
-                TablePlugin tablePlugin = TablePlugin.create(this, true);
-                List<MarkwonPlugin> plugins = new ArrayList<>(MarkdownParserFactory.getPlugins(this, textView, tablePlugin));
+                List<MarkwonPlugin> plugins = new ArrayList<>();
+                plugins.add(TablePlugin.create(this, true));
+                plugins.add(CorePlugin.create(this));
+                plugins.add(CodeBlockPlugin.create(this, false));
                 MarkwonTheme theme = MarkwonTheme.builderWithDefaults(this).setStyles(style).build(plugins);
                 markwon = Markwon.builderWithPlugs(this, plugins).setMarkdownTheme(theme).build();
             }

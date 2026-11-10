@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.noties.markwon.MarkwonPlugin;
 import io.noties.markwon.image.AsyncDrawableSpan;
 
 public class PrinterMarkDownTextView extends AppCompatTextView implements IMarkdownLayer, DefaultLifecycleObserver, TextWatcher {
@@ -104,9 +105,14 @@ public class PrinterMarkDownTextView extends AppCompatTextView implements IMarkd
     }
 
     public void init(@NonNull MarkdownStyles styles, ElementClickEventCallback callback) {
+        init(styles, callback, null);
+    }
+
+    public void init(@NonNull MarkdownStyles styles, ElementClickEventCallback callback,
+                     List<? extends MarkwonPlugin> extensionPlugins) {
         mMarkdownStyles = styles;
         mElementClickEventCallback = callback;
-        mMarkdownParser = MarkdownParserFactory.create(getContext(), this, styles, callback);
+        mMarkdownParser = MarkdownParserFactory.create(getContext(), this, styles, callback, extensionPlugins);
     }
 
     public void setPrintParams(int interval, int chunkSize) {

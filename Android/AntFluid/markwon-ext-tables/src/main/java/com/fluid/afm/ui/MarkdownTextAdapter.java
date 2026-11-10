@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fluid.afm.R;
+import io.noties.markwon.ext.tables.R;
 import com.fluid.afm.markdown.widget.PrinterMarkDownTextView;
 
 import org.commonmark.ext.gfm.tables.TableBlock;

@@ -304,13 +304,9 @@ public class BaseBlockTitleSpan implements LeadingMarginSpan {
 
 
     public void onMagnifyClicked(View widget, String content) {
-        try {
-            Intent intent = new Intent(widget.getContext(), Class.forName("com.fluid.afm.ui.MarkDownPreviewActivity"));
-            intent.putExtras(getPreviewBundle(content));
-            widget.getContext().startActivity(intent);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Intent intent = new Intent(widget.getContext(), com.fluid.afm.ui.MarkDownPreviewActivity.class);
+        intent.putExtras(getPreviewBundle(content));
+        widget.getContext().startActivity(intent);
     }
 
     protected Bundle getPreviewBundle( String content) {

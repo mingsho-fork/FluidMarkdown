@@ -44,6 +44,14 @@ dependencies {
     implementation libs.androidx.ui.tooling.preview
     implementation libs.androidx.material3
     api project(':fluid-markdown')
+    implementation project(':markwon-ext-latex')
+    implementation project(':markwon-ext-strikethrough')
+    implementation project(':markwon-ext-tables')
+    implementation project(':markwon-ext-tasklist')
+    implementation project(':markwon-image')
+    implementation project(':markwon-html')
+    implementation project(':markwon-inline-parser')
+    implementation project(':markwon-syntax-highlight')
     implementation libs.material
     implementation libs.androidx.activity
     implementation libs.androidx.constraintlayout

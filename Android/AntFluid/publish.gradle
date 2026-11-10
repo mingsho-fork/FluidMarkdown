@@ -1,0 +1,116 @@
+apply plugin: 'maven-publish'
+
+def DEFAULT_GROUP_ID = 'com.htrip'
+
+def isReleaseBuild() {
+    return VERSION_NAME.toUpperCase().contains("SNAPSHOT") == false
+}
+
+def sourceJar() {
+    def path = getRootDir()
+    return tasks.create("source${name.capitalize()}Jar", Jar) {
+        group = "publishing"
+        description = "package ${name} source to jar"
+        from "$path/src/main/java"
+        from "$path/src/main/kotlin"
+        destinationDirectory = file("$path/build/libs/")
+        archiveClassifier = 'sources'
+    }
+}
+
+task generateSourcesJar(type: Jar) {
+    group = "publishing"
+    description = "Generate sources JAR for publishing"
+    archiveClassifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+task generateJavadocJar(type: Jar) {
+    group = "publishing"
+    description = "Generate Javadoc JAR for publishing"
+    archiveClassifier = 'javadoc'
+    from android.sourceSets.main.java.srcDirs
+}
+
+//gradle生命周期回调方法，项目完全解析后执行
+//因GroupID和artifactId是在module的build.gradle中定义的，所以需要延时执行
+afterEvaluate {
+    publishing {
+        publications {
+            def buildDir = getLayout().getBuildDirectory()
+            release(MavenPublication) {
+                groupId = project.findProperty('GROUP_ID') ?: DEFAULT_GROUP_ID
+                artifactId = POM_ARTIFACT_ID
+                version = VERSION_NAME
+
+                from components.release
+                // AGP 已自带 releaseSourcesJar（classifier=sources）并随 components.release 发布；
+                // 再手动附加第二个 sources 构件会导致发布报
+                // “multiple artifacts with the identical extension and classifier ('jar', 'sources')”
+//                artifact sourceJar()
+//                // 上传source，这样使用方可以看到方法注释
+//                artifact generateSourcesJar
+//                // 上传javadoc，这样使用方可以看到方法注释
+                artifact generateJavadocJar
+            }
+        }
+
+        repositories {
+            Properties properties = new Properties()
+            def propertiesFile = project.rootProject.file('local.properties')
+            if (propertiesFile.exists()) {
+                properties.load(propertiesFile.newDataInputStream())
+
+                //三个发布仓库互斥，一次只上传到一个目标，优先级：GitHub Packages > 阿里云 > 火山引擎
+                if ("${properties.getProperty('gpr.github')}".equalsIgnoreCase('true')) {
+                    //GitHub Packages 不支持 SNAPSHOT 版本（上传返回 422）。模块仍为 SNAPSHOT 时
+                    //跳过 GitHub 目标（发布走主仓库），避免日常构建被拦截；发布到 GitHub 前需将
+                    //VERSION_NAME 改为正式版本（如 1.0.0）
+                    if (!isReleaseBuild()) {
+                        println "WARN: ${project.name} 版本 ${VERSION_NAME} 为 SNAPSHOT，" +
+                                "GitHub Packages 不支持 SNAPSHOT，已跳过 GitHub 发布目标"
+                    } else {
+                        //配置项：gpr.github.owner（仓库归属，可为用户名或组织，默认取 username）、
+                        //       gpr.github.repository（仓库名）、gpr.github.username（GitHub 用户名）、
+                        //       gpr.github.token（PAT，需 write:packages 权限，缺省回退环境变量）
+                        def githubUsername = properties.getProperty('gpr.github.username') ?: System.getenv('GITHUB_ACTOR')
+                        def githubToken = properties.getProperty('gpr.github.token') ?: System.getenv('GITHUB_TOKEN')
+                        def githubOwner = properties.getProperty('gpr.github.owner') ?: githubUsername
+                        def githubRepository = properties.getProperty('gpr.github.repository')
+                        maven {
+                            allowInsecureProtocol = false
+                            name = "GitHubPackages"
+                            credentials {
+                                username = githubUsername
+                                password = githubToken
+                            }
+                            url = uri("https://maven.pkg.github.com/${githubOwner}/${githubRepository}")
+                        }
+                    }
+                } else if ("${properties.getProperty('gpr.aliyun')}".equalsIgnoreCase('true')) {
+                    maven {
+                        allowInsecureProtocol = false
+                        credentials {
+                            username = properties.getProperty('gpr.aliyun.username')
+                            password = properties.getProperty('gpr.aliyun.password')
+                        }
+                        url = isReleaseBuild() ? properties.getProperty('gpr.aliyun.release_url')
+                                : properties.getProperty('gpr.aliyun.snapshot_url')
+                    }
+                } else {
+                    maven {
+                        allowInsecureProtocol = false
+                        credentials {
+                            username = properties.getProperty('gpr.volcengine.username')
+                            password = properties.getProperty('gpr.volcengine.password')
+                        }
+                        url = isReleaseBuild() ? properties.getProperty('gpr.volcengine.release_url')
+                                : properties.getProperty('gpr.volcengine.snapshot_url')
+                    }
+                }
+            } else {
+                mavenLocal()
+            }
+        }
+    }
+}

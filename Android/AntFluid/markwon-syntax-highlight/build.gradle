@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
 }
 
+apply from: "../publish.gradle"
+
 android {
     namespace 'io.noties.markwon.syntax'
     compileSdk 35
@@ -23,15 +25,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    // AGP 8+ 不再自动创建 SoftwareComponent，必须显式声明，否则 components.release 不存在
+    publishing {
+        singleVariant('release')
+    }
 }
 
 dependencies {
 
     api fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly project(':markwon-core')
+    api project(':markwon-core')
     implementation libs.androidx.appcompat
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
 
+}
+
+ext {
+    GROUP_ID = "io.github.mingsho"
+    VERSION_NAME = "1.0.0"
+    POM_ARTIFACT_ID = "markwon-syntax-highlight"
 }

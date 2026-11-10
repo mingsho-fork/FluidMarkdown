@@ -166,25 +166,21 @@ public class TableBlockTitleBlockSpan extends BaseBlockTitleSpan {
 
     @Override
     public void onMagnifyClicked(View widget, String content) {
-        try {
-            Intent intent = new Intent(widget.getContext(), Class.forName("com.fluid.afm.ui.MarkDownPreviewActivity"));
-            Bundle bundle = new Bundle();
-            if (mTableBlock != null) {
-                sCurrentTableBlock = mTableBlock;
-            }
-            if (mStyle != null) {
-                bundle.putBoolean("hasTableStyle",true);
-                bundle.putParcelable("tableStyle", mStyle);
-            } else {
-                bundle.putBoolean("hasTableStyle", false);
-            }
-            bundle.putInt("columnCount", columnCount);
-            bundle.putBoolean("isTable", true);
-            intent.putExtras(bundle);
-            widget.getContext().startActivity(intent);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        Intent intent = new Intent(widget.getContext(), com.fluid.afm.ui.MarkDownPreviewActivity.class);
+        Bundle bundle = new Bundle();
+        if (mTableBlock != null) {
+            sCurrentTableBlock = mTableBlock;
         }
+        if (mStyle != null) {
+            bundle.putBoolean("hasTableStyle",true);
+            bundle.putParcelable("tableStyle", mStyle);
+        } else {
+            bundle.putBoolean("hasTableStyle", false);
+        }
+        bundle.putInt("columnCount", columnCount);
+        bundle.putBoolean("isTable", true);
+        intent.putExtras(bundle);
+        widget.getContext().startActivity(intent);
     }
     protected Bundle getPreviewBundle(String content) {
         Bundle bundle = super.getPreviewBundle(content);

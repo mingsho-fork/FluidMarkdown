@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
 }
 
+apply from: "../publish.gradle"
+
 android {
     namespace 'io.noties.markwon.ext.latex'
     compileSdk 35
@@ -23,17 +25,28 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    // AGP 8+ 不再自动创建 SoftwareComponent，必须显式声明，否则 components.release 不存在
+    publishing {
+        singleVariant('release')
+    }
 }
 
 dependencies {
 
     implementation libs.androidx.appcompat
-    compileOnly project(':markwon-core')
-    compileOnly project(':markwon-inline-parser')
+    api project(':markwon-core')
+    implementation project(':markwon-inline-parser')
     implementation 'ru.noties:jlatexmath-android:0.2.0'
     implementation 'ru.noties:jlatexmath-android-font-cyrillic:0.2.0'
     implementation 'ru.noties:jlatexmath-android-font-greek:0.2.0'
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+}
+
+ext {
+    GROUP_ID = "io.github.mingsho"
+    VERSION_NAME = "1.0.0"
+    POM_ARTIFACT_ID = "markwon-ext-latex"
 }

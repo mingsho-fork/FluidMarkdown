@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fluid.afm.R;
-import com.fluid.afm.markdown.MarkdownParser;
-import com.fluid.afm.markdown.MarkdownParserFactory;
+import com.fluid.markdown.SampleMarkdownPlugins;
 import com.fluid.afm.markdown.widget.PrinterMarkDownTextView;
 import com.fluid.afm.styles.MarkdownStyles;
 
@@ -50,7 +49,8 @@ public class PrinterActivity extends AppCompatActivity {
             }
         });
 
-        markDownTextView.init(MarkdownStyles.getDefaultStyles(), null);
+        markDownTextView.init(MarkdownStyles.getDefaultStyles(), null,
+                SampleMarkdownPlugins.create(this, markDownTextView, null));
         markDownTextView.setPrintParams(25, 1);
 
         findViewById(R.id.start).setOnClickListener(v -> {

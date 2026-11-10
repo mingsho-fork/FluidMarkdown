@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
 }
 
+apply from: "../publish.gradle"
+
 android {
     namespace 'com.fluid.afm'
     compileSdk 35
@@ -23,23 +25,26 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    // AGP 8+ 不再自动创建 SoftwareComponent，必须显式声明，否则 components.release 不存在
+    publishing {
+        singleVariant('release')
+    }
 }
 
 dependencies {
 
     implementation libs.androidx.appcompat
     api project(':markwon-core')
-    api project(':markwon-ext-latex')
-    api project(':markwon-ext-strikethrough')
-    api project(':markwon-ext-tables')
-    api project(':markwon-ext-tasklist')
-    api project(':markwon-image')
-    api project(':markwon-html')
-    api project(':markwon-inline-parser')
-    api project(':markwon-syntax-highlight')
     implementation libs.androidx.recyclerview
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
     implementation 'com.vdurmont:emoji-java:5.1.1'
+}
+
+ext{
+    GROUP_ID = "io.github.mingsho"
+    VERSION_NAME = "1.0.0"
+    POM_ARTIFACT_ID = "fluid-markdown"
 }

@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         val styles =  MarkdownStyles.getDefaultStyles()
         styles.linkStyle().icon("local://mipmap/link")
         styles.setTitleStyle(0, TitleStyle.create(1.5f).icon("local://mipmap/title"))
-        markdownTextView.init(styles, object : ElementClickEventCallback {
+        val callback = object : ElementClickEventCallback {
                 override fun onLinkClicked(params: Map<String?, Any?>?): Boolean {
                     val url = params?.get(ElementClickEventCallback.PARAM_KEY_LINK) as String?
                     if(url.equals("open://printer")) {
@@ -75,8 +75,8 @@ class MainActivity : AppCompatActivity() {
                     Log.d("exposureSpmBehavior", models.toString())
                 }
             }
-        )
 
+        markdownTextView.init(styles, callback, SampleMarkdownPlugins.create(this, markdownTextView, callback))
         markdownTextView.setMarkdownText(markdown)
         val scroller = findViewById<NestedScrollView>(R.id.scrollView)
 
